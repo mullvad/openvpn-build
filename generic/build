@@ -71,22 +71,18 @@ download1() {
 
 download() {
 	for url in \
-		${LZO_URL} \
-		${OPENSSL_URL} \
-		${TAP_WINDOWS_URL} \
-		${OPENVPN_URL}
+		${TAP_WINDOWS_URL}
 		do
 		download1 "${url}"
 	done
 
-	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 4 ]; then
+	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 2 ]; then
 		die "sources is unclean."
 	fi
 }
 
 create_layout() {
 	[ -e "${IMAGEROOT}" ] && rm -fr "${IMAGEROOT}"
-	[ -e "${BUILDROOT}" ] && rm -fr "${BUILDROOT}"
 
 	if ! [ -e "${SOURCESROOT}" ]; then
 		mkdir -p "${SOURCESROOT}" || die "Cannot create '${SOURCESROOT}'"
