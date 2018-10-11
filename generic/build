@@ -73,7 +73,7 @@ download() {
 		download1 "${url}"
 	done
 
-	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 2 ]; then
+	if [ "$(ls "${SOURCESROOT}" | wc -l | sed 's/[ \t]//g')" != 1 ]; then
 		die "sources is unclean."
 	fi
 }
@@ -190,21 +190,6 @@ build_dep() {
 		[ -n "${SAVE_DEP_CACHE}" ] && depcache_save openssl
 	fi
 
-
-	if [ -n "${USE_DEP_CACHE}" ]; then
-		depcache_extract lzo
-	else
-		echo "Build lzo"
-		cd "${BUILDROOT}/lzo"* || die "cd lzo"
-		./configure ${CONFIGOPTS} ${EXTRA_LZO_CONFIG} \
-			$(empty_ifelse "${DO_STATIC}" --enable-shared --disable-shared) \
-			|| die "Configure lzo"
-		${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${INSTALL_ROOT}" \
-			|| die "make lzo"
-
-		[ -n "${SAVE_DEP_CACHE}" ] && depcache_save lzo
-	fi
-
 	echo "tap-windows"
 	cp "${BUILDROOT}"/tap-windows-*/include/* "${OPENVPN_ROOT}/include" || die "tap-windows copy"
 
@@ -217,7 +202,6 @@ build_openvpn() {
 	cd "${BUILDROOT}/openvpn-${OPENVPN_VERSION}" || die "cd openvpn"
 	./configure ${CONFIGOPTS} ${EXTRA_OPENVPN_CONFIG} \
 		$(empty_ifelse "${DO_STATIC}") \
-		--enable-lzo \
 		--with-special-build="${SPECIAL_BUILD}" \
 		|| die "Configure openvpn"
 	${MAKE} ${MAKEOPTS} ${MAKE_AUTOCONF_INSTALL_TARGET} DESTDIR="${OPENVPN_ROOT}" || die "make openvpn"
@@ -344,8 +328,6 @@ export OPENSSL_CRYPTO_CFLAGS="-I${OPENVPN_ROOT}/include"
 export OPENSSL_CRYPTO_LIBS="-L${OPENVPN_ROOT}/lib -lcrypto"
 export OPENSSL_CFLAGS="-I${OPENVPN_ROOT}/include"
 export OPENSSL_LIBS="-L${OPENVPN_ROOT}/lib -lssl -lcrypto"
-export LZO_CFLAGS="-I${OPENVPN_ROOT}/include"
-export LZO_LIBS="-L${OPENVPN_ROOT}/lib -llzo2"
 export PKCS11_HELPER_CFLAGS="-I${OPENVPN_ROOT}/include"
 export PKCS11_HELPER_LIBS="-L${OPENVPN_ROOT}/lib -lpkcs11-helper"
 export TAP_CFLAGS="-I${OPENVPN_ROOT}/include"
